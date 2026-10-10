@@ -28,8 +28,10 @@ Baselines to compare against: equal split and first-come-first-served allocation
   scikit-learn, streamlit, folium, pytest
 - Pin versions in requirements.txt after installing; do not guess version numbers.
 - Commands (Claude: fill these in as they are created, keep them accurate):
-  - setup:
-  - start XMPP server: `spade run`
+  - setup: `py -3.12 -m venv .venv`, `.venv\Scripts\activate`, `pip install -r requirements.txt`
+  - start XMPP server: `spade run --host localhost --memory` (`--host` must match the agents' `@localhost`)
+  - toy Contract Net demo: `python -m src.sim.demo_contract_net --embedded-server`
+    (on Windows, agents currently fail to log in to an external `spade run`; see docs/known_issues.md)
   - run simulation:
   - tests: `pytest`
   - dashboard:
