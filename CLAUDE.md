@@ -32,6 +32,11 @@ Baselines to compare against: equal split and first-come-first-served allocation
   - start XMPP server: `spade run --host localhost --memory` (`--host` must match the agents' `@localhost`)
   - toy Contract Net demo: `python -m src.sim.demo_contract_net --embedded-server`
     (on Windows, agents currently fail to log in to an external `spade run`; see docs/known_issues.md)
+  - risk scoring demo (stub WellMonitor -> RiskScoringAgent -> stub subscriber):
+    `python -m src.sim.demo_risk_scoring --embedded-server` (writes logs/risk_scores.csv)
+  - WQI tier distribution vs Cooray et al.: `python -m src.sim.validate_wqi`
+  - check the risk score by hand: `python -m src.sim.check_risk --F 2.5 --hardness 300`
+    (one well) or `python -m src.sim.check_risk --village Padaviya --month 1`
   - run simulation:
   - tests: `pytest`
   - dashboard:
