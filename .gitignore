@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Generated simulation output (regenerate with src/sim; keep the folder via .gitkeep)
+logs/*.csv
+logs/*.log
+
+# Tooling / OS
+.pytest_cache/
+.streamlit/
+.idea/
+.vscode/
+Thumbs.db
+desktop.ini

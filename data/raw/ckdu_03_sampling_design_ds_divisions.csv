@@ -1,0 +1,12 @@
+ds_division,district,ckdu_prevalence_class,samples_per_season,population,n_wells_modelled,distance_to_depot_km,lat,lon,source,notes
+Padaviya,Anuradhapura,High,7,,,,,,"Cooray et al. 2019, Sec 2.1","Fill population from Census 2011 (Dept of Census and Statistics); other columns are your modelling assumptions"
+Kebithigollawa,Anuradhapura,High,8,,,,,,"Cooray et al. 2019, Sec 2.1",
+Medawachchiya,Anuradhapura,High,10,,,,,,"Cooray et al. 2019, Sec 2.1",
+Kahatagasdigiliya,Anuradhapura,High,10,,,,,,"Cooray et al. 2019, Sec 2.1",
+Mihintale,Anuradhapura,Moderate,8,,,,,,"Cooray et al. 2019, Sec 2.1",
+Talawa,Anuradhapura,Moderate,7,,,,,,"Cooray et al. 2019, Sec 2.1",
+Nochchiyagama,Anuradhapura,Moderate,11,,,,,,"Cooray et al. 2019, Sec 2.1",
+Galnewa,Anuradhapura,Mild,9,,,,,,"Cooray et al. 2019, Sec 2.1",
+Palagale,Anuradhapura,Mild,8,,,,,,"Cooray et al. 2019, Sec 2.1",
+Monaragala,Monaragala,Non-prevalence,5,,,,,,"Cooray et al. 2019, Sec 2.1","Comparison district"
+Kandy,Kandy,Non-prevalence,5,,,,,,"Cooray et al. 2019, Sec 2.1","Comparison district"

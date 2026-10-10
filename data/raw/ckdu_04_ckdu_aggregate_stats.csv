@@ -1,0 +1,21 @@
+scope,period,metric,value,unit_or_note,source
+Anuradhapura district,2009,CKD/CKDu incidence,0.10,"Unit not given in the text I read; check Fig. 1 of the paper",Ranasinghe et al. 2019 (BMC Nephrol 20:338)
+Anuradhapura district,2012,CKD/CKDu incidence,0.14,"Same note",Ranasinghe et al. 2019
+Anuradhapura district,2016,CKD/CKDu incidence,0.39,"Same note",Ranasinghe et al. 2019
+Anuradhapura district,2017,CKD/CKDu incidence,0.29,"Same note",Ranasinghe et al. 2019
+Polonnaruwa district,2009,CKD/CKDu incidence,0.09,"Same note",Ranasinghe et al. 2019
+Polonnaruwa district,2012,CKD/CKDu incidence,0.13,"Same note",Ranasinghe et al. 2019
+Polonnaruwa district,2016,CKD/CKDu incidence,0.46,"Same note",Ranasinghe et al. 2019
+Polonnaruwa district,2017,CKD/CKDu incidence,0.41,"Same note",Ranasinghe et al. 2019
+Anuradhapura high-incidence DS divisions (GPS mapped),GPS mapping 2012-2015,Point prevalence range,1.52-3.35,"As given in Results text; the Abstract gives 2.44-4.35 for all high-incidence areas, so the paper is internally inconsistent: cite carefully",Ranasinghe et al. 2019
+Polonnaruwa high-incidence DS divisions (GPS mapped),GPS mapping 2013-2014,Point prevalence range,0.67-1.25,"As given in Results text",Ranasinghe et al. 2019
+Anuradhapura (GPS mapped DS),GPS mapping,Patients identified,6335,count,Ranasinghe et al. 2019
+Polonnaruwa (GPS mapped DS),GPS mapping,Patients identified,3318,count,Ranasinghe et al. 2019
+Both (10 GPS mapped DS),GPS mapping,Patients identified,9653,count,Ranasinghe et al. 2019
+Anuradhapura district,diagnosed 2003-2017,5-year survival,72.4,percent,Ranasinghe et al. 2019
+Polonnaruwa district,diagnosed 2003-2017,5-year survival,68.3,percent,Ranasinghe et al. 2019
+North Central Province,2003-2017,Total CKD/CKDu patients in analysis,30566,count,Ranasinghe et al. 2019
+Anuradhapura DS divisions with period incidence > 2.40,2012-2017,Number of DS divisions,6,count,Ranasinghe et al. 2019
+Polonnaruwa DS divisions with period incidence > 2.40,2012-2017,Number of DS divisions,1,count,Ranasinghe et al. 2019
+Madawachchiya,earlier survey,Point prevalence,3.7,percent (cited in Ranasinghe et al. 2019 from Chandrajith et al. 2011),Chandrajith et al. 2011 via Ranasinghe et al. 2019
+Huruluwewa,earlier survey,Point prevalence,3.2,percent (cited in Ranasinghe et al. 2019 from Chandrajith et al. 2011),Chandrajith et al. 2011 via Ranasinghe et al. 2019

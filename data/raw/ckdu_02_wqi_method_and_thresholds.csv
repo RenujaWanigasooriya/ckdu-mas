@@ -1,0 +1,19 @@
+item,type,value,unit,source,notes
+WQI formula,method,"WQI = sum(Wi * qi); qi = (Ci / Si) * 100; Wi = wi / sum(wi)",,"Cooray et al. 2019 (IJERPH 16:1698), Sec 2.3","Ci = measured concentration (mg/L), Si = Sri Lankan drinking water standard for that parameter"
+WQI parameters,method,"pH; TDS; total hardness; total alkalinity; Ca; Mg; Na; F; Cl; SO4; NO3; Fe; DOC",,"Cooray et al. 2019, Sec 2.3","DOC added because of disinfection by-product concern"
+Weight wi: TDS,weight,5,,"Cooray et al. 2019, Sec 2.3","Maximum weight (5) stated for TDS, fluoride, nitrate, DOC"
+Weight wi: F,weight,5,,"Cooray et al. 2019, Sec 2.3",
+Weight wi: NO3,weight,5,,"Cooray et al. 2019, Sec 2.3",
+Weight wi: DOC,weight,5,,"Cooray et al. 2019, Sec 2.3",
+Weight wi: pH; hardness; alkalinity; Ca; Mg; Na; Cl; SO4; Fe,weight,TO_FILL,,"Cooray et al. 2019, Supplementary Table S1","Not available in the article text. Download supplementary file from https://www.mdpi.com/1660-4601/16/10/1698/s1 (also holds the SLS values Si used)"
+WQI class: Excellent,class,<50,,"Cooray et al. 2019, Table 2 and Conclusions","Can be consumed without treatment"
+WQI class: Good,class,50-100,,"Cooray et al. 2019, Table 2",
+WQI class: Poor,class,100-200,,"Cooray et al. 2019, Table 2","Their samples never exceeded 200 so no further classes were used; check Table S2 for classes above 200"
+WQI reference point,note,90,,"Cooray et al. 2019, Sec 3.4","A sample exactly meeting the Sri Lankan standard scores 90"
+Fluoride limit (SLS 614:2013),threshold,1.0,mg/L,"Cooray et al. 2019, Figure 3 caption","Maximum allowable F in potable water per SLS 614:2013"
+Fluoride limit (WHO 1994 tropical),threshold,0.6,mg/L,"Nikagolla et al. 2020 (Sci Total Environ 745:140896)","Cited by that paper as the safe limit for tropical countries"
+Magnesium guideline,threshold,30,mg/L,"Nikagolla et al. 2020","Quoted as the Sri Lankan drinking water guideline (SLS 2013)"
+Nitrate maximum allowable,threshold,50,mg/L,"Nikagolla et al. 2020","As stated in the paper"
+Nitrite WHO long-term guideline,threshold,0.2,mg/L,"Nikagolla et al. 2020",
+Lead limit,threshold,0.01,mg/L,"Nikagolla et al. 2020","As stated in the paper"
+DOC natural-groundwater level,threshold,4,mg/L,"Cooray et al. 2019, Sec 3.2","Natural unpolluted groundwater typically below this; above suggests anthropogenic influence"
