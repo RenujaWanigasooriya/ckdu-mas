@@ -32,6 +32,7 @@ Baselines to compare against: equal split and first-come-first-served allocation
   - start XMPP server: `spade run --host localhost --memory` (`--host` must match the agents' `@localhost`)
   - toy Contract Net demo: `python -m src.sim.demo_contract_net --embedded-server`
     (on Windows, agents currently fail to log in to an external `spade run`; see docs/known_issues.md)
+  - well monitor demo (ticks -> readings -> villages): `python -m src.sim.demo_well_monitor --embedded-server`
   - run simulation:
   - tests: `pytest`
   - dashboard:

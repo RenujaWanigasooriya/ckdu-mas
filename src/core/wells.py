@@ -101,6 +101,32 @@ def synthetic_only(df: pd.DataFrame) -> pd.DataFrame:
     return df[df["source"] == "synthetic"].reset_index(drop=True)
 
 
+def month_for_index(month_index: int, start_month: int = 1) -> int:
+    """Calendar month (1-12) for a 0-based simulated month counter starting at ``start_month``."""
+    if month_index < 0:
+        raise ValueError(f"month_index must be >= 0, got {month_index}")
+    if start_month not in MONTH_TO_SEASON:
+        raise ValueError(f"start_month must be 1-12, got {start_month}")
+    return (start_month - 1 + month_index) % 12 + 1
+
+
+def readings_for_month(monthly: pd.DataFrame, ds_division: str, month: int) -> tuple[str, list[dict]]:
+    """One village's readings for one calendar month, ready for a ``well_readings`` message body.
+
+    Returns (source, rows). Raises if the village has no rows that month or its rows mix sources,
+    because one message carries exactly one source label.
+    """
+    season_for_month(month)
+    sub = monthly[(monthly["ds_division"] == ds_division) & (monthly["month"] == month)]
+    if sub.empty:
+        raise ValueError(f"no readings for {ds_division!r} in month {month}")
+    check_sources(sub)
+    sub = sub.sort_values("well_id", kind="stable")[READING_COLUMNS]
+    # .tolist() converts numpy scalars to plain Python types so the rows serialise to JSON
+    rows = [dict(zip(READING_COLUMNS, values)) for values in sub.astype(object).values.tolist()]
+    return str(sub["source"].iloc[0]), rows
+
+
 def expand_to_months(seasonal: pd.DataFrame) -> pd.DataFrame:
     """Turn one reading per well per season into one reading per well per calendar month.
 
