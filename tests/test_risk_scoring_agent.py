@@ -1,4 +1,5 @@
 """RiskScoringAgent.score without XMPP: the agent is built but never started."""
+import pandas as pd
 import pytest
 
 from src.agents.risk_scoring import RiskScoringAgent
@@ -111,3 +112,36 @@ def test_empty_and_mislabelled_messages(agent, readings):
     assert record["tier"] == risk_tiers.UNKNOWN_TIER and "no readings" in detail["error"]
     record, detail = agent.score(_body(_rows(readings), ds="Kandy"))
     assert record["tier"] == risk_tiers.UNKNOWN_TIER and "other divisions" in detail["error"]
+
+
+def test_well_risk_output_for_function_3(agent, readings):
+    rows = _rows(readings)
+    rows[0]["F_mg_L"] = -1.0  # rejected well must not appear in well_risk
+    record, detail = agent.score(_body(rows))
+    body = detail["well_risk"]
+    ontology.validate(ontology.INFORM, body)
+    ontology.decode(ontology.INFORM, ontology.encode(ontology.INFORM, body))  # survives the wire
+    assert body["ds_division"] == "Padaviya" and body["ckdu_prevalence_class"] == "High"
+    assert body["month"] == 1 and body["month_index"] == 0 and body["source"] == "synthetic"
+    assert len(body["wells"]) == 19 and rows[0]["well_id"] not in {w["well_id"] for w in body["wells"]}
+    for w in body["wells"]:
+        assert w["tier"] == risk_tiers.tier_for_wqi(w["wqi"], agent.classes)
+        assert set(w["q"]) == {"pH", "hardness", "alkalinity", "F", "Cl", "SO4", "Fe", "DOC"}
+    # the village record is the median of exactly these wells
+    # 19 wells: the village WQI is the middle well (well WQIs are rounded to 0.1, hence the tolerance)
+    assert record["wqi"] == pytest.approx(sorted(w["wqi"] for w in body["wells"])[9], abs=0.1)
+
+
+def test_no_well_risk_when_nothing_scored(agent):
+    _, detail = agent.score(_body([]))
+    assert detail["well_risk"] is None
+
+
+def test_write_outputs_files_for_function_3(agent, readings, tmp_path):
+    from src.sim.risk_outputs import write_outputs
+    history = [agent.score(_body(_rows(readings, ds, 1), ds))[1] for ds in ("Padaviya", "Kandy")]
+    history.append(agent.score(_body([]))[1])  # an error message: village row, no well rows
+    villages, well_table = write_outputs(history, tmp_path / "r.csv", tmp_path / "w.csv")
+    assert len(villages) == 3 and len(well_table) == 40
+    saved = pd.read_csv(tmp_path / "w.csv")
+    assert {"well_id", "ds_division", "ckdu_prevalence_class", "wqi", "tier", "q_F"} <= set(saved.columns)

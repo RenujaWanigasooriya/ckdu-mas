@@ -145,3 +145,23 @@ synthetic generator's assumed correlation (`RHO = 0.6`). Re-check once the full 
 Median WQI by Cooray prevalence class: High 97.1, Moderate 108.0, Mild 91.4, Non-prevalence 69.9.
 Only the Non-prevalence controls separate clearly. That is an alignment observation on synthetic
 data, not evidence about CKDu.
+
+## Output for Function 3 (HotspotAgent)
+
+Function 2 gives Function 3 two things per village per month, live as messages and as files.
+
+| Message (live) | File (standalone) | Content |
+|---|---|---|
+| `risk_record` | `logs/risk_scores.csv` | village WQI (median), tier, drivers; the file adds share of wells Poor or worse, worst tier, rejected wells, errors |
+| `well_risk` (new, `src/core/ontology.py`) | `logs/well_scores.csv` | per well: `well_id`, `wqi`, `tier`, `q` (quality rating per parameter), plus `ds_division`, `district`, `ckdu_prevalence_class`, `month`, `source` |
+
+To receive the messages, pass the HotspotAgent's JID in `hotspot_subscribers` (for `well_risk`)
+and `subscribers` (for `risk_record`) when creating `RiskScoringAgent`. `ckdu_prevalence_class`
+is Cooray et al.'s class per division: it is what the alignment check (Spearman or clustering)
+compares against. Wells rejected for unusable values are left out of `well_risk`.
+
+`well_risk` is an additive ontology change (no existing message changed). Ask the team to
+sign it off before the week-3 schema freeze.
+
+Run the real chain: `python -m src.sim.demo_f1_f2 --embedded-server` (Function 1's
+WellMonitorAgent → Function 2 → VillageAgents and a Function 3 stand-in that only collects).

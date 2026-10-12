@@ -133,6 +133,40 @@ def village_risk(scored: pd.DataFrame, classes: list[WqiClass]) -> dict:
     }
 
 
+def well_risk(month_index: int, readings: pd.DataFrame, scored: pd.DataFrame,
+              classes: list[WqiClass]) -> dict:
+    """The ``well_risk`` message body: per-well detail for one village-month (to the HotspotAgent).
+
+    ``readings`` are the validated rows of one village and one month; ``scored`` is
+    ``wqi.score_frame(readings)`` (same index). Identifiers come from the rows themselves.
+    """
+    first = readings.iloc[0]
+    rows = []
+    for idx, r in readings.iterrows():
+        s = scored.loc[idx]
+        value = None if pd.isna(s["wqi"]) else round(float(s["wqi"]), 1)
+        q = {p: round(float(s[f"q_{p}"]), 1) for p in wqi_mod.WQI_PARAMS if not pd.isna(s[f"q_{p}"])}
+        rows.append({"well_id": str(r["well_id"]), "wqi": value,
+                     "tier": tier_for_wqi(value, classes), "q": q})
+    return {
+        "type": "well_risk",
+        "month_index": int(month_index),
+        "month": int(first["month"]),
+        "ds_division": str(first["ds_division"]),
+        "district": str(first["district"]),
+        "ckdu_prevalence_class": str(first["ckdu_prevalence_class"]),
+        "source": str(first["source"]),
+        "wells": rows,
+    }
+
+
+def well_rows(body: dict) -> list[dict]:
+    """Flatten a ``well_risk`` body to one row per well (q_<param> columns), e.g. for a CSV."""
+    keys = ("month_index", "month", "ds_division", "district", "ckdu_prevalence_class", "source")
+    return [{**{k: body[k] for k in keys}, "well_id": w["well_id"], "wqi": w["wqi"], "tier": w["tier"],
+             **{f"q_{p}": v for p, v in w["q"].items()}} for w in body["wells"]]
+
+
 def risk_record(month_index: int, ds_division: str, village: dict) -> dict:
     """The ``risk_record`` message body from src/core/ontology.py for one village-month."""
     wqi_value = village["wqi"]

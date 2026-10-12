@@ -1,8 +1,11 @@
 """RiskScoringAgent: WQI per well and one risk tier per village (DS division), per month.
 
-Receives ``well_readings`` (inform) from WellMonitorAgent, one message per DS division per month.
-Sends one ``risk_record`` (inform) per message to every subscriber (ResourceCoordinator, Alert,
-Hotspot). Scoring logic lives in src/core/wqi.py and src/core/risk_tiers.py.
+Receives ``well_readings`` (inform) from WellMonitorAgent (Function 1), one message per DS
+division per month. For each message it sends:
+- ``risk_record`` (village level) to every subscriber (Coordinator, Alert, Hotspot) and to that
+  division's own VillageAgent only, if ``village_jids`` is given (a village never sees the others);
+- ``well_risk`` (per-well detail) to every hotspot subscriber (Function 3, HotspotAgent).
+Scoring logic lives in src/core/wqi.py and src/core/risk_tiers.py.
 
 The tier is a risk indicator derived from published water-quality thresholds. It is not a CKDu
 diagnosis and not a claim that the water causes CKDu.
@@ -27,10 +30,14 @@ class RiskScoringAgent(Agent):
         subscribers: list[str],
         method: wqi.WqiMethod,
         classes: list[risk_tiers.WqiClass],
+        hotspot_subscribers: list[str] | None = None,
+        village_jids: dict[str, str] | None = None,
         **kwargs,
     ):
         super().__init__(jid, password, **kwargs)
         self.subscribers = list(subscribers)
+        self.hotspot_subscribers = list(hotspot_subscribers or [])
+        self.village_jids = dict(village_jids or {})
         self.method = method
         self.classes = classes
         # Full village detail per message (beyond the ontology fields) for the dashboard/evaluation
@@ -39,6 +46,8 @@ class RiskScoringAgent(Agent):
     def score(self, body: dict) -> tuple[dict, dict]:
         """Score one well_readings body. Returns (risk_record body, full village detail).
 
+        ``detail["well_risk"]`` is the well_risk message body, or None when nothing was scored.
+
         Never raises on bad readings: SPADE kills a behaviour on the first uncaught exception,
         which would silence this agent for the rest of the simulation. Bad input instead yields
         a risk_record with wqi=None and tier "Unknown", and the reason is kept in ``error``.
@@ -46,6 +55,8 @@ class RiskScoringAgent(Agent):
         error = None
         rejected: list[str] = []
         readings = pd.DataFrame()
+        month = None
+        well_risk = None
         try:
             readings = pd.DataFrame(body["readings"])
             if readings.empty or readings.columns.empty:
@@ -69,7 +80,10 @@ class RiskScoringAgent(Agent):
                 raise ValueError(f"message source {body['source']!r} but rows labelled {sorted(labels)}")
             if set(valid["ds_division"]) != {body["ds_division"]}:
                 raise ValueError(f"rows from other divisions than {body['ds_division']!r}")
-            village = risk_tiers.village_risk(wqi.score_frame(valid, self.method), self.classes)
+            scored = wqi.score_frame(valid, self.method)
+            village = risk_tiers.village_risk(scored, self.classes)
+            month = int(valid["month"].iloc[0])
+            well_risk = risk_tiers.well_risk(body["month_index"], valid, scored, self.classes)
             if village["n_scored"] == 0:
                 error = "no WQI parameter present in any well"
         except (ValueError, KeyError, TypeError) as exc:
@@ -80,10 +94,11 @@ class RiskScoringAgent(Agent):
             print(f"[{self.jid}] {body.get('ds_division')} month {body.get('month_index')}: "
                   f"error={error} rejected={rejected}")
         record = risk_tiers.risk_record(body["month_index"], body["ds_division"], village)
-        detail = {"month_index": body["month_index"], "ds_division": body["ds_division"],
-                  "source": body["source"], **village,
+        detail = {"month_index": body["month_index"], "month": month,
+                  "ds_division": body["ds_division"], "source": body["source"], **village,
                   "n_wells": len(readings),  # wells received, including rejected ones
-                  "n_rejected": len(rejected), "rejected": "; ".join(rejected), "error": error}
+                  "n_rejected": len(rejected), "rejected": "; ".join(rejected), "error": error,
+                  "well_risk": well_risk}
         return record, detail
 
     class ScoreReadings(CyclicBehaviour):
@@ -97,8 +112,12 @@ class RiskScoringAgent(Agent):
             agent: RiskScoringAgent = self.agent
             record, detail = agent.score(body)
             agent.history.append(detail)
-            for to in agent.subscribers:
+            village = agent.village_jids.get(body["ds_division"])
+            for to in agent.subscribers + ([village] if village else []):
                 await common.send(self, to, ontology.INFORM, record, msg.thread)
+            if detail["well_risk"] is not None:
+                for to in agent.hotspot_subscribers:
+                    await common.send(self, to, ontology.INFORM, detail["well_risk"], msg.thread)
 
     async def setup(self):
         self.add_behaviour(self.ScoreReadings())

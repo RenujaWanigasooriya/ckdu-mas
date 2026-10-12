@@ -38,9 +38,13 @@ Baselines to compare against: equal split and first-come-first-served allocation
   - check the risk score by hand: `python -m src.sim.check_risk --F 2.5 --hardness 300`
     (one well) or `python -m src.sim.check_risk --village Padaviya --month 1`
   - well monitor demo (ticks -> readings -> villages): `python -m src.sim.demo_well_monitor --embedded-server`
+  - F1 -> F2 chain (real WellMonitor -> RiskScoring -> villages + F3 stand-in):
+    `python -m src.sim.demo_f1_f2 --embedded-server` (writes logs/risk_scores.csv, logs/well_scores.csv)
   - run simulation:
   - tests: `pytest`
   - dashboard:
+  - risk map (Function 2, animated): `python -m src.sim.demo_risk_scoring --embedded-server --months all`,
+    then `streamlit run dashboard/risk_map.py`
 
 ## Layout
 - data/raw: real values extracted from papers (see data/raw/README_data_sources.md). Treat as read-only.
