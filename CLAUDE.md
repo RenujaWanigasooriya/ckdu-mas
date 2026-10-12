@@ -37,6 +37,7 @@ Baselines to compare against: equal split and first-come-first-served allocation
   - WQI tier distribution vs Cooray et al.: `python -m src.sim.validate_wqi`
   - check the risk score by hand: `python -m src.sim.check_risk --F 2.5 --hardness 300`
     (one well) or `python -m src.sim.check_risk --village Padaviya --month 1`
+  - well monitor demo (ticks -> readings -> villages): `python -m src.sim.demo_well_monitor --embedded-server`
   - run simulation:
   - tests: `pytest`
   - dashboard:

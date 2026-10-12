@@ -87,3 +87,37 @@ def test_all_raw_loaders_read_real_files():
     assert not load_data.load_wqi_method().empty
     assert not load_data.load_aggregate_stats().empty
     assert not load_data.load_validation_benchmarks().empty
+
+
+def test_month_for_index_wraps_and_validates():
+    assert [wells.month_for_index(i) for i in (0, 11, 12, 13)] == [1, 12, 1, 2]
+    assert wells.month_for_index(0, start_month=10) == 10
+    assert wells.month_for_index(3, start_month=10) == 1
+    with pytest.raises(ValueError):
+        wells.month_for_index(-1)
+    with pytest.raises(ValueError):
+        wells.month_for_index(0, start_month=0)
+
+
+def test_readings_for_month_builds_a_valid_message_body():
+    import json
+    from src.core import ontology
+
+    monthly = load_data.load_monthly_readings()
+    source, rows = wells.readings_for_month(monthly, "Padaviya", 11)
+    assert source == "synthetic"
+    assert len(rows) == 20
+    assert all(r["ds_division"] == "Padaviya" and r["month"] == 11 for r in rows)
+    assert list(rows[0]) == wells.READING_COLUMNS
+    body = {"type": "well_readings", "month_index": 10, "ds_division": "Padaviya",
+            "source": source, "readings": rows}
+    assert ontology.decode(ontology.INFORM, ontology.encode(ontology.INFORM, body)) == body
+
+
+def test_readings_for_month_rejects_unknown_village_and_mixed_sources():
+    monthly = wells.expand_to_months(_seasonal())
+    with pytest.raises(ValueError, match="no readings"):
+        wells.readings_for_month(monthly, "Atlantis", 1)
+    mixed = pd.concat([monthly, monthly.assign(source="real", well_id="REAL-1")])
+    with pytest.raises(wells.MixedSourceError):
+        wells.readings_for_month(mixed, "Padaviya", 1)
